@@ -1,8 +1,8 @@
-function y = sobel_vertical_matching(image_A,image_B,threshold,name,min_edges)
-    [A,B] = sobel_filter_with_pooling(image_A,image_B);
+function y = canny_horizontal_matching(image_A,image_B,threshold,name,min_edges)
+    A = edge(image_A,'Canny');
+    B = edge(image_B,'Canny');
     % call for edge detected image
     rows = size(A,1);
-    columns = size(A,2);
     search_order = round(rows*.2):round(rows*.8);
     search_order = search_order(randperm(length(search_order)));
     % We are limiting the range of the stitching to get better quality
@@ -12,10 +12,10 @@ function y = sobel_vertical_matching(image_A,image_B,threshold,name,min_edges)
         matched_edges = 0;
         total_edges = 0;
         % count total and matched edge points
-        for j=1:columns
-            if A(i,j)==1 || B(i,j)==1
+        for j=1:rows
+            if A(j,i)==1 || B(j,i)==1
                 total_edges = total_edges + 1;
-                if A(i,j)==B(i,j)
+                if A(j,i)==B(j,i)
                     matched_edges = matched_edges + 1;
                 end
             end
@@ -23,27 +23,21 @@ function y = sobel_vertical_matching(image_A,image_B,threshold,name,min_edges)
         % check if edge points meet thresholds for stitching
         if total_edges*threshold<=matched_edges && total_edges>min_edges
             AB = image_A;
-            AB(i*2+1:end,:) = image_B(i*2+1:end,:);
+            AB(:,i+1:end) = image_B(:,i+1:end);
             figure;
             imshow(AB);
-            imwrite(AB,strcat(name,'vertical-sobel.jpg'));
+            imwrite(AB,strcat(name,'horizontal-canny.jpg'));
             % Save stitched image
             BA = image_B;
-            BA(i*2+1:end,:) = image_A(i*2+1:end,:);
+            BA(:,i+1:end) = image_A(:,i+1:end);
             figure;
             imshow(BA);
-            imwrite(BA,strcat(name,'other-vertical-sobel.jpg'));
+            imwrite(BA,strcat(name,'other-horizontal-sobel.jpg'));
             % Save opposite stitched image
-            edge_A = A;
-            edge_A(i+1:end,:) = B(i+1:end,:);
-            imshow(edge_A);
-            imwrite(edge_A,strcat(name,'edge-vertical-sobel.jpg'));
-            % Save stitched edge image
-            edge_B = B;
-            edge_B(i+1:end,:) = A(i+1:end,:);
-            imshow(edge_B);
-            imwrite(edge_B,strcat(name,'other-edge-vertical-sobel.jpg'));
-            % Save stitched edge image
+            A(:,i+1:end) = B(:,i+1:end);
+            imshow(A);
+            imwrite(A,strcat(name,'edge-horizontal-canny.jpg'));
+            % Save stitched edge image.
             disp("Match!");
             y = 1;
             break; % end function

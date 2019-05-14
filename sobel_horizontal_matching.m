@@ -27,10 +27,22 @@ function y = sobel_horizontal_matching(image_A,image_B,threshold,name,min_edges)
             imshow(AB);
             imwrite(AB,strcat(name,'horizontal-sobel.jpg'));
             % Save stitched image
-            A(:,i+1:end) = B(:,i+1:end);
-            imshow(A);
-            imwrite(A,strcat(name,'edge-horizontal-sobel.jpg'));
+            BA = image_B;
+            BA(:,i*2+1:end) = image_A(:,i*2+1:end);
+            figure;
+            imshow(BA);
+            imwrite(BA,strcat(name,'other-horizontal-sobel.jpg'));
+            % Save opposite stitched image
+            edge_A = A;
+            edge_A(:,i+1:end) = B(:,i+1:end);
+            imshow(edge_A);
+            imwrite(edge_A,strcat(name,'edge-horizontal-sobel.jpg'));
             % Save stitched edge image
+            edge_B = B;
+            edge_B(:,i+1:end) = A(:,i+1:end);
+            imshow(edge_B);
+            imwrite(edge_B,strcat(name,'other-edge-horizontal-sobel.jpg'));
+            % Save other stitched edge image
             disp("Match!");
             y = 1;
             break; % end function
